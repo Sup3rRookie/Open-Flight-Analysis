@@ -34,36 +34,49 @@ cursor.executemany("INSERT INTO 'Open Flights' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?
 # df.to_sql('Open Flights', conn, if_exists='append', index=False)
 
 """ Analysis """
-@staticmethod
-def list_of_malaysia_airports() -> None:
-	''' Display all airports in Malaysia.'''
+def list_of_malaysia_airports() -> list:
+	""" Display all airports in Malaysia."""
 	results = cursor.execute("SELECT * from OpenFlights WHERE Country = 'Malaysia' ORDER by 'City' LIMIT 120")
 	return results.fetchall()
 
-@staticmethod
-def count_all_airports_in_malaysia() -> None:
-	''' Total airports in Malaysia.'''
+def count_all_airports_in_malaysia() -> int:
+	""" Total airports in Malaysia."""
 	results = cursor.execute("SELECT DISTINCT count(*) from OpenFlights WHERE Country = 'Malaysia' ORDER by 'City' LIMIT 120")
-	return results.fetchall()
+	return results.fetchall()[0][0]
 
 @lru_cache(maxsize=None)
-def distance_between_each_airports() -> None:
-	'''Determine the distance in between the Malaysia airports'''
+def distance_between_each_airports(departure_airport) -> dict:
+	""" Determine the distance in between the Malaysia airports """
 	results = cursor.execute("SELECT Name,City,Latitude, Longitude from OpenFlights WHERE Country = 'Malaysia' order by 'City' LIMIT 120")
 	airports = list(results)
-	first_airport = (airports[0][-2], airports[0][-1])
-	source = airports[0][0]
+	try:
+		klia = [i for i in airports if i[0] == departure_airport][0]
+	except Exception as e:
+		raise ValueError(f"Airport Not Found: {departure_airport}")
+	klia_airport = (klia[-2],klia[-1])
+	airport_distance = {}
 
 	for airport in airports:
 		destination = airport[0]
 		second_airport = (airport[-2], airport[-1])
-		total_distance = f'{(geodesic(first_airport, second_airport).km):.2f}'
-		result = print(f'From {source} to {destination}. The distance is {total_distance}km')
-	return result
+		total_distance = geodesic(klia_airport, second_airport).km
+		airport_distance[destination] = total_distance
+	return airport_distance
 
-""" Function called"""
-# list_of_malaysia_airports()
-# count_all_airports_in_malaysia()
-distance_between_each_airports()
-conn.commit()
-conn.close()
+def print_distance_between_each_airports(departure_airport,airport_distance_dict):
+	""" Print distance between airports """
+	for arrival_airport, distance in airport_distance_dict.items():
+		print(f'From {departure_airport} to {arrival_airport}. The distance is {distance:.2f}km')
+
+
+# print(count_all_airports_in_malaysia())
+print(list_of_malaysia_airports())
+if __name__ == '__main__':
+	""" Function called """
+	# list_of_malaysia_airports()
+	# count_all_airports_in_malaysia()
+	# departure_airports = "Kuala Lumpur International Airportsss"
+	# result = distance_between_each_airports(departure_airports)
+	# print_distance_between_each_airports(departure_airports,result)
+	conn.commit()
+	conn.close()
