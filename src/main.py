@@ -72,8 +72,8 @@ if __name__ == '__main__':
 	""" Function called """
 	# list_of_malaysia_airports()
 	# count_all_airports_in_malaysia()
-	# departure_airports = "Kuala Lumpur International Airportsss"
-	# result = distance_between_each_airports(departure_airports)
-	# print_distance_between_each_airports(departure_airports,result)
+	departure_airports = "Kuala Lumpur International Airport"
+	result = distance_between_each_airports(departure_airports)
+	print_distance_between_each_airports(departure_airports,result)
 	conn.commit()
 	conn.close()
