@@ -68,9 +68,6 @@ def print_distance_between_each_airports(departure_airport,airport_distance_dict
 	for arrival_airport, distance in airport_distance_dict.items():
 		print(f'From {departure_airport} to {arrival_airport}. The distance is {distance:.2f}km')
 
-
-# print(count_all_airports_in_malaysia())
-print(list_of_malaysia_airports())
 if __name__ == '__main__':
 	""" Function called """
 	# list_of_malaysia_airports()
